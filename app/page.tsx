@@ -496,7 +496,7 @@ function DashboardSection({
 
     try {
       const todayStr = new Date().toISOString().split('T')[0]
-      const message = `Run the weekly research digest pipeline for the following topics: ${topicsToUse.join(', ')}. Send the digest email to: ${recipientEmail || 'preview-only@none.com'}. Today's date is ${todayStr}. Search ArXiv for papers published between ${dateFrom} and ${dateTo}. Only include papers from this date range. Search ArXiv for the most recent papers on each topic within this date range, then compose and send a structured digest email with paper summaries, titles with links, and key insights.`
+      const message = `Run the weekly research digest pipeline for the following topics: ${topicsToUse.join(', ')}. Send the digest email to: ${recipientEmail || 'preview-only@none.com'}. Today's date is ${todayStr}. Preferred date range: ${dateFrom} to ${dateTo}. Search ArXiv for the most recent papers on each topic, sorted by submission date descending. Prioritize papers from the preferred date range but always return at least 3-5 papers per topic even if they fall outside the range. Never return empty results. Then compose and send a structured digest email with paper summaries, titles with links, and key insights.`
       const result = await callAIAgent(message, MANAGER_AGENT_ID)
       const data = safeParseResult(result)
 
