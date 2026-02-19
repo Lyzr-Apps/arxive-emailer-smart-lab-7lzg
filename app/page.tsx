@@ -17,7 +17,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { FiGrid, FiBookOpen, FiSettings, FiClock, FiPlus, FiTrash2, FiEdit2, FiCheck, FiX, FiExternalLink, FiPlay, FiPause, FiRefreshCw, FiSearch, FiChevronDown, FiChevronUp, FiMenu, FiMail, FiFileText, FiZap, FiActivity, FiAlertCircle, FiCheckCircle, FiLoader } from 'react-icons/fi'
+import { FiGrid, FiBookOpen, FiSettings, FiClock, FiPlus, FiTrash2, FiEdit2, FiCheck, FiX, FiExternalLink, FiPlay, FiPause, FiRefreshCw, FiSearch, FiChevronDown, FiChevronUp, FiMenu, FiMail, FiFileText, FiZap, FiActivity, FiAlertCircle, FiCheckCircle, FiLoader, FiCalendar } from 'react-icons/fi'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -457,6 +457,14 @@ function DashboardSection({
   const [previewData, setPreviewData] = useState<any>(null)
   const [previewError, setPreviewError] = useState<string | null>(null)
 
+  // Date range for fetching papers
+  const today = new Date()
+  const sevenDaysAgo = new Date(today)
+  sevenDaysAgo.setDate(today.getDate() - 7)
+  const formatDateForInput = (d: Date) => d.toISOString().split('T')[0]
+  const [dateFrom, setDateFrom] = useState(formatDateForInput(sevenDaysAgo))
+  const [dateTo, setDateTo] = useState(formatDateForInput(today))
+
   const displayTopics = sampleMode && topics.length === 0 ? SAMPLE_TOPICS : topics
 
   const handleAddTopic = () => {
@@ -487,7 +495,8 @@ function DashboardSection({
     setActiveAgentId(MANAGER_AGENT_ID)
 
     try {
-      const message = `Run the weekly research digest pipeline for the following topics: ${topicsToUse.join(', ')}. Send the digest email to: ${recipientEmail || 'preview-only@none.com'}. Search ArXiv for the most recent papers on each topic, then compose and send a structured digest email with paper summaries, titles with links, and key insights.`
+      const todayStr = new Date().toISOString().split('T')[0]
+      const message = `Run the weekly research digest pipeline for the following topics: ${topicsToUse.join(', ')}. Send the digest email to: ${recipientEmail || 'preview-only@none.com'}. Today's date is ${todayStr}. Search ArXiv for papers published between ${dateFrom} and ${dateTo}. Only include papers from this date range. Search ArXiv for the most recent papers on each topic within this date range, then compose and send a structured digest email with paper summaries, titles with links, and key insights.`
       const result = await callAIAgent(message, MANAGER_AGENT_ID)
       const data = safeParseResult(result)
 
@@ -725,6 +734,40 @@ function DashboardSection({
               <span className="text-muted-foreground">Digests Generated</span>
               <span className="font-mono font-bold">{digestHistory.length}</span>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border bg-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <FiCalendar className="w-3.5 h-3.5" />
+              Search Date Range
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <Label htmlFor="date-from" className="text-xs text-muted-foreground">From</Label>
+              <Input
+                id="date-from"
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="mt-1 h-8 text-sm font-mono"
+              />
+            </div>
+            <div>
+              <Label htmlFor="date-to" className="text-xs text-muted-foreground">To</Label>
+              <Input
+                id="date-to"
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="mt-1 h-8 text-sm font-mono"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground border-l-2 border-primary/30 pl-2">
+              Papers published within this range will be fetched from ArXiv.
+            </p>
           </CardContent>
         </Card>
 
