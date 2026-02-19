@@ -456,6 +456,19 @@ function DashboardSection({
   const [previewLoading, setPreviewLoading] = useState(false)
   const [previewData, setPreviewData] = useState<any>(null)
   const [previewError, setPreviewError] = useState<string | null>(null)
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+
+  // Timer for elapsed time during loading
+  useEffect(() => {
+    if (!previewLoading) {
+      setElapsedSeconds(0)
+      return
+    }
+    const interval = setInterval(() => {
+      setElapsedSeconds((prev) => prev + 1)
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [previewLoading])
 
   // Date range for fetching papers
   const today = new Date()
@@ -498,6 +511,16 @@ function DashboardSection({
       const todayStr = new Date().toISOString().split('T')[0]
       const message = `Run the weekly research digest pipeline for the following topics: ${topicsToUse.join(', ')}. Send the digest email to: ${recipientEmail || 'preview-only@none.com'}. Today's date is ${todayStr}. Preferred date range: ${dateFrom} to ${dateTo}. Search ArXiv for the most recent papers on each topic, sorted by submission date descending. Prioritize papers from the preferred date range but always return at least 3-5 papers per topic even if they fall outside the range. Never return empty results. Then compose and send a structured digest email with paper summaries, titles with links, and key insights.`
       const result = await callAIAgent(message, MANAGER_AGENT_ID)
+
+      // Check if the call itself failed
+      if (!result || !result.success) {
+        const errorMsg = result?.error || result?.response?.message || 'Agent call failed. Please try again.'
+        setPreviewError(errorMsg)
+        setPreviewLoading(false)
+        setActiveAgentId(null)
+        return
+      }
+
       const data = safeParseResult(result)
 
       setPreviewData(data)
@@ -515,7 +538,8 @@ function DashboardSection({
       }
       setDigestHistory((prev) => [newEntry, ...prev])
     } catch (err: any) {
-      setPreviewError(err?.message || 'Failed to generate preview')
+      console.error('Generate preview error:', err)
+      setPreviewError(err?.message || 'Failed to generate preview. The agent may have timed out. Please try again.')
     } finally {
       setPreviewLoading(false)
       setActiveAgentId(null)
@@ -610,19 +634,42 @@ function DashboardSection({
         )}
 
         {previewLoading && (
-          <Card className="border-border bg-card">
+          <Card className="border-primary/30 bg-card">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-mono flex items-center gap-2">
-                <FiLoader className="w-4 h-4 animate-spin" />
-                Generating digest preview...
-              </CardTitle>
-              <CardDescription className="text-xs">The manager agent is coordinating the ArXiv search and email composition pipeline</CardDescription>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-mono flex items-center gap-2">
+                  <FiLoader className="w-4 h-4 animate-spin text-primary" />
+                  Generating digest preview...
+                </CardTitle>
+                <Badge variant="outline" className="text-xs font-mono tabular-nums">
+                  {Math.floor(elapsedSeconds / 60)}:{String(elapsedSeconds % 60).padStart(2, '0')}
+                </Badge>
+              </div>
+              <CardDescription className="text-xs mt-1">
+                The manager agent is coordinating the ArXiv search and email composition pipeline. This typically takes 1-3 minutes.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <Skeleton className="h-4 w-3/4" />
+            <CardContent className="space-y-2">
+              <div className="space-y-2 text-xs font-mono">
+                <div className="flex items-center gap-2">
+                  <div className={cn('w-2 h-2 rounded-full', elapsedSeconds >= 0 ? 'bg-primary animate-pulse' : 'bg-muted-foreground/40')} />
+                  <span className={elapsedSeconds >= 0 ? 'text-foreground' : 'text-muted-foreground'}>Manager agent activated</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={cn('w-2 h-2 rounded-full', elapsedSeconds >= 5 ? 'bg-primary animate-pulse' : 'bg-muted-foreground/40')} />
+                  <span className={elapsedSeconds >= 5 ? 'text-foreground' : 'text-muted-foreground'}>Searching ArXiv for papers...</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={cn('w-2 h-2 rounded-full', elapsedSeconds >= 30 ? 'bg-primary animate-pulse' : 'bg-muted-foreground/40')} />
+                  <span className={elapsedSeconds >= 30 ? 'text-foreground' : 'text-muted-foreground'}>Composing digest email...</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={cn('w-2 h-2 rounded-full', elapsedSeconds >= 60 ? 'bg-primary animate-pulse' : 'bg-muted-foreground/40')} />
+                  <span className={elapsedSeconds >= 60 ? 'text-foreground' : 'text-muted-foreground'}>Finalizing results...</span>
+                </div>
+              </div>
+              <Skeleton className="h-4 w-3/4 mt-3" />
               <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-4 w-2/3" />
             </CardContent>
           </Card>
         )}

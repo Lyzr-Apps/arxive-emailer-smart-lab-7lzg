@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import parseLLMJson from '@/lib/jsonParser'
 
+// Allow up to 5 minutes for manager agents coordinating sub-agents
+export const maxDuration = 300
+
 const LYZR_API_URL = 'https://agent-prod.studio.lyzr.ai/v3/inference/chat/'
 const LYZR_API_KEY = process.env.LYZR_API_KEY || ''
 
@@ -163,16 +166,41 @@ export async function POST(request: NextRequest) {
       payload.assets = assets
     }
 
-    const response = await fetch(LYZR_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': LYZR_API_KEY,
-      },
-      body: JSON.stringify(payload),
-    })
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 300000) // 5 min timeout for manager agents
 
-    const rawText = await response.text()
+    let response: Response
+    let rawText: string
+    try {
+      response = await fetch(LYZR_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': LYZR_API_KEY,
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      })
+      clearTimeout(timeout)
+      rawText = await response.text()
+    } catch (fetchErr: any) {
+      clearTimeout(timeout)
+      const isTimeout = fetchErr?.name === 'AbortError'
+      return NextResponse.json(
+        {
+          success: false,
+          response: {
+            status: 'error',
+            result: {},
+            message: isTimeout
+              ? 'Agent request timed out after 5 minutes. The manager agent may need more time to coordinate sub-agents. Please try again.'
+              : `Network error calling agent API: ${fetchErr?.message || 'Unknown error'}`,
+          },
+          error: isTimeout ? 'Request timed out' : (fetchErr?.message || 'Network error'),
+        },
+        { status: isTimeout ? 504 : 502 }
+      )
+    }
 
     if (response.ok) {
       // Parse the Lyzr API envelope first to extract module_outputs
