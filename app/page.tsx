@@ -71,6 +71,29 @@ interface TopicPapers {
 
 const SAMPLE_TOPICS = ['Large Language Models', 'Reinforcement Learning', 'Computer Vision', 'Graph Neural Networks']
 
+const SUGGESTED_TOPICS = [
+  'Large Language Models',
+  'Reinforcement Learning',
+  'Computer Vision',
+  'Graph Neural Networks',
+  'Transformer Architectures',
+  'Diffusion Models',
+  'Natural Language Processing',
+  'Federated Learning',
+  'Neural Architecture Search',
+  'Robotics and Control',
+  'Generative Adversarial Networks',
+  'Multi-Agent Systems',
+  'Explainable AI',
+  'Speech Recognition',
+  'Knowledge Graphs',
+  'Quantum Machine Learning',
+  'Medical Image Analysis',
+  'Autonomous Driving',
+  'Recommendation Systems',
+  'Time Series Forecasting',
+]
+
 const SAMPLE_DIGEST: DigestEntry = {
   id: 'sample-1',
   date: new Date().toISOString(),
@@ -603,10 +626,10 @@ function DashboardSection({
               </div>
             )}
             {displayTopics.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-6 text-muted-foreground">
                 <FiFileText className="w-8 h-8 mx-auto mb-2 opacity-40" />
                 <p className="text-sm">No topics yet</p>
-                <p className="text-xs mt-1">Add your first research topic to get started</p>
+                <p className="text-xs mt-1">Select from suggestions below or add your own</p>
               </div>
             ) : (
               <ScrollArea className="max-h-[320px]">
@@ -622,6 +645,32 @@ function DashboardSection({
                 </div>
               </ScrollArea>
             )}
+            {/* Suggested Topics */}
+            {(() => {
+              const available = SUGGESTED_TOPICS.filter((s) => !displayTopics.includes(s))
+              if (available.length === 0) return null
+              return (
+                <div className="mt-3 pt-3 border-t border-border">
+                  <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wider">Suggested Topics</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {available.slice(0, 12).map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        onClick={() => {
+                          if (!topics.includes(suggestion)) {
+                            setTopics((prev) => [...prev, suggestion])
+                          }
+                        }}
+                        className="inline-flex items-center gap-1 px-2 py-1 text-xs font-mono border border-border bg-secondary/30 text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/10 transition-colors cursor-pointer"
+                      >
+                        <FiPlus className="w-3 h-3" />
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
           </CardContent>
         </Card>
 
@@ -884,13 +933,11 @@ function HistorySection({
           </CardContent>
         </Card>
       ) : (
-        <ScrollArea className="max-h-[calc(100vh-220px)]">
-          <div className="space-y-2">
-            {filtered.map((digest, index) => (
-              <DigestCard key={digest.id} digest={digest} defaultExpanded={index === 0} />
-            ))}
-          </div>
-        </ScrollArea>
+        <div className="overflow-y-auto max-h-[calc(100vh-200px)] pr-1 space-y-2">
+          {filtered.map((digest, index) => (
+            <DigestCard key={digest.id} digest={digest} defaultExpanded={index === 0} />
+          ))}
+        </div>
       )}
     </div>
   )
