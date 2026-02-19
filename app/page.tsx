@@ -23,10 +23,10 @@ import { FiGrid, FiBookOpen, FiSettings, FiClock, FiPlus, FiTrash2, FiEdit2, FiC
 // Constants
 // ---------------------------------------------------------------------------
 
-const MANAGER_AGENT_ID = '6997857840bf11ec17b860ac'
+const MANAGER_AGENT_ID = '69978cc371b7a9a008a12b35'
 const ARXIV_AGENT_ID = '69978565c1ac1837f449f43b'
 const EMAIL_AGENT_ID = '69978564c1ac1837f449f439'
-const SCHEDULE_ID = '6997857f399dfadeac37bd6b'
+const SCHEDULE_ID = '69978ccd399dfadeac37bdea'
 
 const AGENTS = [
   { id: MANAGER_AGENT_ID, name: 'Research Digest Manager', role: 'Orchestrates the weekly pipeline' },
