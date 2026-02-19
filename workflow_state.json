@@ -1,0 +1,22 @@
+{
+  "agents": {
+    "arxiv_research_agent": {
+      "agent_id": "69978565c1ac1837f449f43b",
+      "name": "ArXiv Research Agent"
+    },
+    "email_digest_agent": {
+      "agent_id": "69978564c1ac1837f449f439",
+      "name": "Email Digest Agent"
+    },
+    "research_digest_manager": {
+      "agent_id": "6997857840bf11ec17b860ac",
+      "name": "Research Digest Manager"
+    }
+  },
+  "schedule": {
+    "schedule_id": "6997857f399dfadeac37bd6b",
+    "agent_id": "6997857840bf11ec17b860ac",
+    "cron_expression": "0 8 * * 1",
+    "timezone": "Asia/Kolkata"
+  }
+}

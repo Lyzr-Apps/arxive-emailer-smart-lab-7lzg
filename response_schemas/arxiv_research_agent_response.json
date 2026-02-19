@@ -1,0 +1,50 @@
+{
+  "agent_name": "ArXiv Research Agent",
+  "agent_id": "69978565c1ac1837f449f43b",
+  "description": "Searches ArXiv for recent papers matching each user topic, retrieves metadata including titles, abstracts, authors, and links",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "result": {
+      "topics": [
+        {
+          "topic_name": "string",
+          "papers": [
+            {
+              "title": "string",
+              "authors": "string",
+              "abstract": "string",
+              "published_date": "string",
+              "arxiv_url": "string",
+              "relevance_score": "number"
+            }
+          ]
+        }
+      ],
+      "search_date": "string",
+      "total_papers_found": "number"
+    }
+  },
+  "example_response": {
+    "result": {
+      "topics": [
+        {
+          "topic_name": "sample string",
+          "papers": [
+            {
+              "title": "sample string",
+              "authors": "sample string",
+              "abstract": "sample string",
+              "published_date": "sample string",
+              "arxiv_url": "sample string",
+              "relevance_score": 0
+            }
+          ]
+        }
+      ],
+      "search_date": "sample string",
+      "total_papers_found": 0
+    }
+  }
+}

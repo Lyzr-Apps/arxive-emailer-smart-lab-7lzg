@@ -1,0 +1,34 @@
+{
+  "agent_name": "Email Digest Agent",
+  "agent_id": "69978564c1ac1837f449f439",
+  "description": "Composes a structured weekly digest email with paper summaries, titles/links, and key insights, then sends it to the user's email via Gmail",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "result": {
+      "email_sent": "boolean",
+      "recipient_email": "string",
+      "subject": "string",
+      "digest_summary": "string",
+      "topics_covered": [
+        "string"
+      ],
+      "total_papers_included": "number",
+      "send_timestamp": "string"
+    }
+  },
+  "example_response": {
+    "result": {
+      "email_sent": false,
+      "recipient_email": "sample string",
+      "subject": "sample string",
+      "digest_summary": "sample string",
+      "topics_covered": [
+        "sample string"
+      ],
+      "total_papers_included": 0,
+      "send_timestamp": "sample string"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "agent_name": "Research Digest Manager",
+  "agent_id": "6997857840bf11ec17b860ac",
+  "description": "Coordinates the weekly research pipeline \u2014 reads user topics, delegates paper search to ArXiv agent, passes results to Email agent for digest composition and delivery",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "result": {
+      "workflow_status": "string",
+      "topics_processed": [
+        "string"
+      ],
+      "total_papers_found": "number",
+      "email_sent": "boolean",
+      "recipient_email": "string",
+      "digest_summary": "string",
+      "processing_timestamp": "string",
+      "agent_responses": {
+        "arxiv_agent": {
+          "status": "string",
+          "papers_found": "number"
+        },
+        "email_agent": {
+          "status": "string",
+          "email_delivered": "boolean"
+        }
+      }
+    }
+  },
+  "example_response": {
+    "result": {
+      "workflow_status": "sample string",
+      "topics_processed": [
+        "sample string"
+      ],
+      "total_papers_found": 0,
+      "email_sent": false,
+      "recipient_email": "sample string",
+      "digest_summary": "sample string",
+      "processing_timestamp": "sample string",
+      "agent_responses": {
+        "arxiv_agent": {
+          "status": "sample string",
+          "papers_found": 0
+        },
+        "email_agent": {
+          "status": "sample string",
+          "email_delivered": false
+        }
+      }
+    }
+  }
+}

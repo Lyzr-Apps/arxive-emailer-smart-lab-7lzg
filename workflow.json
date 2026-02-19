@@ -1,0 +1,62 @@
+{
+  "nodes": [
+    {
+      "id": "input_node",
+      "type": "Input",
+      "label": "User Topics & Email",
+      "nodeCategory": "input"
+    },
+    {
+      "id": "research_digest_manager",
+      "type": "Agent",
+      "label": "Research Digest Manager",
+      "nodeCategory": "agent"
+    },
+    {
+      "id": "arxiv_research_agent",
+      "type": "Agent",
+      "label": "ArXiv Research Agent",
+      "nodeCategory": "agent"
+    },
+    {
+      "id": "email_digest_agent",
+      "type": "Agent",
+      "label": "Email Digest Agent",
+      "nodeCategory": "agent"
+    },
+    {
+      "id": "scheduler_node",
+      "type": "Conditional",
+      "label": "Scheduled: Monday 8:00 AM IST",
+      "nodeCategory": "conditional"
+    },
+    {
+      "id": "output_node",
+      "type": "Output",
+      "label": "Digest Status Output",
+      "nodeCategory": "end"
+    }
+  ],
+  "edges": [
+    {
+      "source": "input_node",
+      "target": "research_digest_manager"
+    },
+    {
+      "source": "research_digest_manager",
+      "target": "arxiv_research_agent"
+    },
+    {
+      "source": "research_digest_manager",
+      "target": "email_digest_agent"
+    },
+    {
+      "source": "research_digest_manager",
+      "target": "output_node"
+    },
+    {
+      "source": "scheduler_node",
+      "target": "research_digest_manager"
+    }
+  ]
+}
